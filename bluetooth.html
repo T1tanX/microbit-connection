@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Micro:bit</title>
+    <style>
+        /* General page styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        /* Button styling */
+        button {
+            background-color: #6200ea; /* Purple for primary buttons */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3700b3; /* Darker purple on hover */
+        }
+
+        button:disabled {
+            background-color: #444; /* Disabled button color */
+            cursor: not-allowed;
+        }
+
+        /* Layout and spacing */
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Alert styling */
+        .alert {
+            background-color: #ff9800;
+            color: white;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .alert.error {
+            background-color: #f44336;
+        }
+
+        .alert.success {
+            background-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Micro:bit Connection</h1>
+
+<div class="buttons-container">
+    <button id="connect">Connect to Micro:bit</button>
+    <button id="turnOn" disabled>Turn On</button>
+    <button id="turnOff" disabled>Turn Off</button>
+</div>
+
+<div id="alert" class="alert"></div>
+
+<script>
+    let device;
+
+    // Show alert message
+    function showAlert(message, type) {
+        const alertBox = document.getElementById('alert');
+        alertBox.className = 'alert ' + (type || 'info');
+        alertBox.innerHTML = message;
+        alertBox.style.display = 'block';
+
+        setTimeout(() => {
+            alertBox.style.display = 'none';
+        }, 3000);
+    }
+
+    // Connect to the Micro:bit
+    document.getElementById("connect").addEventListener("click", async () => {
+        try {
+            device = await navigator.bluetooth.requestDevice({
+                acceptAllDevices: true,
+                optionalServices: ['battery_service']
+            });
+            console.log("Connected to:", device.name);
+            showAlert(`Connected to ${device.name}`, 'success');
+
+            // Enable Turn On and Turn Off buttons
+            document.getElementById("turnOn").disabled = false;
+            document.getElementById("turnOff").disabled = false;
+
+        } catch (error) {
+            console.error("Error connecting:", error);
+            showAlert("Connection failed. Please try again.", 'error');
+        }
+    });
+
+    // Turn on the Micro:bit
+    document.getElementById("turnOn").addEventListener("click", () => {
+        if (device) {
+            showAlert("Turning on Micro:bit...", 'success');
+            // Add custom command to turn on the Micro:bit (if possible)
+        } else {
+            showAlert("Please connect to the Micro:bit first.", 'error');
+        }
+    });
+
+    // Turn off the Micro:bit
+    document.getElementById("turnOff").addEventListener("click", () => {
+        if (device) {
+            showAlert("Turning off Micro:bit...", 'success');
+            // Add custom command to turn off the Micro:bit (if possible)
+        } else {
+            showAlert("Please connect to the Micro:bit first.", 'error');
+        }
+    });
+</script>
+
+</body>
+</html>
